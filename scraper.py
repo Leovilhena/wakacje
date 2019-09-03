@@ -1,3 +1,5 @@
+#!/bin/python
+
 import io
 import csv
 import traceback
@@ -9,6 +11,9 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+from selenium.webdriver.firefox.options import Options
+options = Options()
+options.headless = True
 
 
 def get_url(url:str, retries:int=3, timeout:tuple=(9.0, 21.0), headers:dict=None, cookies:dict=None):
@@ -44,15 +49,18 @@ def compare_prices(data_price: int, fetched_price: int) -> bool:
         return False
 
 def take_screeshot(url: str, driver: webdriver) -> str:
-    # TODO request retry
     driver.get(url)
     driver.save_screenshot("screenshot.png")
     driver.close()
 
+def get_screenshot_filename(url: str) -> str:
+    pass
+
 def main():
-    path = 'C:\\Users\\Leo\\Downloads\\wakacje_scrape.csv'
-    driver = webdriver.Firefox('C:\\Users\\Leo\\Downloads\\geckodriver-v0.24.0-win64\\geckodriver.exe')  # FIXME
-    for data in stream_data_from_csv(path):
+    driver_path = '/Users/leovilhena/wakacje/'
+    csv_path = '/Users/leovilhena/wakacje_scrape.csv'
+    driver = webdriver.Firefox(driver_path, options=options)
+    for data in stream_data_from_csv(csv_path):
         response = get_url(data['url_oferta'])
         parsed_price = parse_price(response)
         if compare_prices(int(data['cena']), parsed_price):
